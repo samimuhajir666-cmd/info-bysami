@@ -129,42 +129,51 @@ function askAboutSkill(skillName) {
 }
 // ... tumhare pehle wale functions (askAI, showAllProjects, etc.)
 
-// ========== YAHAN SE NAYA CODE PASTE KARO ==========
-// Gateway Modal Logic
-const BACKEND_URL = 'http://localhost:5000'; // baad mein change karna
+// Gateway Modal Logic - Working Version
+const BACKEND_URL = 'http://localhost:5000'; // Change to your deployed backend later
 
-if (!localStorage.getItem('siteAccess')) {
-    document.getElementById('gatewayModal').style.display = 'flex';
-} else {
-    document.getElementById('gatewayModal').style.display = 'none';
-}
-
-document.getElementById('gatewayForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const name = document.getElementById('gatewayName').value;
-    const email = document.getElementById('gatewayEmail').value;
+window.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('gatewayModal');
+    const form = document.getElementById('gatewayForm');
     const msgDiv = document.getElementById('gatewayMsg');
 
-    msgDiv.innerHTML = 'Saving your info...';
-
-    try {
-        const res = await fetch(`${BACKEND_URL}/api/messages`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, message: 'Accessed portfolio via gateway' })
-        });
-        const data = await res.json();
-        if (res.ok) {
-            localStorage.setItem('siteAccess', 'true');
-            document.getElementById('gatewayModal').style.display = 'none';
-        } else {
-            msgDiv.innerHTML = '❌ Error: ' + (data.msg || 'Please try again');
-        }
-    } catch (err) {
-        console.error(err);
-        msgDiv.innerHTML = '❌ Backend not reachable. Still granting access.';
-        localStorage.setItem('siteAccess', 'true');
-        document.getElementById('gatewayModal').style.display = 'none';
+    // Check if already accessed
+    if (!localStorage.getItem('siteAccess')) {
+        modal.style.display = 'flex';
+    } else {
+        modal.style.display = 'none';
     }
+
+    // Form submit handler
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('gatewayName').value;
+        const email = document.getElementById('gatewayEmail').value;
+
+        msgDiv.innerHTML = 'Saving info...';
+        msgDiv.style.color = 'white';
+
+        try {
+            const response = await fetch(`${BACKEND_URL}/api/messages`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, message: 'Accessed portfolio via gateway' })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                localStorage.setItem('siteAccess', 'true');
+                modal.style.display = 'none';
+                // Optional: reload page or just hide modal
+                // location.reload(); // uncomment if page content not visible
+            } else {
+                msgDiv.innerHTML = '❌ Error: ' + (data.msg || 'Try again');
+            }
+        } catch (err) {
+            console.error(err);
+            msgDiv.innerHTML = '❌ Backend not reachable. Still granting access.';
+            // Fallback: still allow access
+            localStorage.setItem('siteAccess', 'true');
+            modal.style.display = 'none';
+        }
+    });
 });
-// ========== YAHAN TAK ==========
