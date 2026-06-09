@@ -480,3 +480,7 @@ footer {
     margin-top: 15px;
     font-size: 14px;
 }
+.modal {
+    display: none;  /* Initially hidden */
+    /* baaki properties same */
+}
