@@ -127,3 +127,44 @@ function askAboutSkill(skillName) {
     let reply = skillReplies[skillName] || `🔧 ${skillName}: Part of Sami's AI toolkit.`;
     answerDiv.innerText = reply;
 }
+// ... tumhare pehle wale functions (askAI, showAllProjects, etc.)
+
+// ========== YAHAN SE NAYA CODE PASTE KARO ==========
+// Gateway Modal Logic
+const BACKEND_URL = 'http://localhost:5000'; // baad mein change karna
+
+if (!localStorage.getItem('siteAccess')) {
+    document.getElementById('gatewayModal').style.display = 'flex';
+} else {
+    document.getElementById('gatewayModal').style.display = 'none';
+}
+
+document.getElementById('gatewayForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('gatewayName').value;
+    const email = document.getElementById('gatewayEmail').value;
+    const msgDiv = document.getElementById('gatewayMsg');
+
+    msgDiv.innerHTML = 'Saving your info...';
+
+    try {
+        const res = await fetch(`${BACKEND_URL}/api/messages`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, message: 'Accessed portfolio via gateway' })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            localStorage.setItem('siteAccess', 'true');
+            document.getElementById('gatewayModal').style.display = 'none';
+        } else {
+            msgDiv.innerHTML = '❌ Error: ' + (data.msg || 'Please try again');
+        }
+    } catch (err) {
+        console.error(err);
+        msgDiv.innerHTML = '❌ Backend not reachable. Still granting access.';
+        localStorage.setItem('siteAccess', 'true');
+        document.getElementById('gatewayModal').style.display = 'none';
+    }
+});
+// ========== YAHAN TAK ==========
